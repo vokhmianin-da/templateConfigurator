@@ -13,7 +13,8 @@ TEMPLATE = app
 
 
 SOURCES += main.cpp\
-        mainwindow.cpp
+        mainwindow.cpp \
+    configjson.cpp
 
 HEADERS  += mainwindow.h \
     rapidjson/error/en.h \
@@ -52,6 +53,7 @@ HEADERS  += mainwindow.h \
     rapidjson/schema.h \
     rapidjson/stream.h \
     rapidjson/stringbuffer.h \
-    rapidjson/writer.h
+    rapidjson/writer.h \
+    configjson.h
 
 FORMS    += mainwindow.ui
