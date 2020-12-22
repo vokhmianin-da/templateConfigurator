@@ -34,6 +34,7 @@ void MainWindow::on_pbSelectFile_clicked()
         {
            conf->configName.remove(".json");    //удаляем лишнее
            ui->lbStatus->setText("Файл выбран");
+           ui->lbFileName->setText(conf->configName);
         }
         else
         {
