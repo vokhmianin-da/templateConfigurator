@@ -32,6 +32,8 @@ private slots:
 
     void on_pbCreateTemplate_clicked();
 
+    void on_pbCreateJson_clicked();
+
 private:
     Ui::MainWindow *ui;
     configJson *conf;
