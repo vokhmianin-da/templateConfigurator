@@ -13,11 +13,19 @@ MainWindow::MainWindow(QWidget *parent) :
     createTemplateFunctions{
         createTemplateIEC101,
         createTemplateIEC104
+        },
+    createMasterJSONFunctions{
+        createMasterJSONIEC101,
+        createMasterJSONIEC104
         }
 {
     ui->setupUi(this);
     conf = new configJson;
     filter = trUtf8("Файл json(*.json)");
+
+    /*Можно вводить только целочисленные данные */
+    ui->leLinkAddr->setValidator( new QIntValidator);
+    ui->leASDUAddr->setValidator( new QIntValidator);
 }
 
 MainWindow::~MainWindow()
@@ -263,6 +271,288 @@ void MainWindow::createTemplateIEC104(MainWindow *mainWindow)
     mainWindow->ui->lbStatus->setText("template OK!");
 }
 
+void MainWindow::createMasterJSONIEC101(MainWindow *mainWindow)
+{
+    ofstream file;
+    StringBuffer s;
+    Writer<StringBuffer> writer(s);
+    std::ifstream ifs(mainWindow->conf->templateName.toStdString());
+    IStreamWrapper isw(ifs);
+    Document documentFromFile;
+    documentFromFile.ParseStream(isw);
+
+    s.Clear();
+    writer.Reset(s);
+
+    /*Удаляем лишнее*/
+    int deleter = mainWindow->conf->configName.lastIndexOf("/");
+    QString tempString;
+    tempString = mainWindow->conf->configName.remove(0, deleter+1);
+
+    string tmp = mainWindow->conf->master.toStdString() + tempString.toStdString() + mainWindow->conf->sJson.toStdString();
+
+    file.open(tmp.c_str());
+
+    if (!file.is_open())
+    {
+        mainWindow->ui->lbStatus->setText("HARD FAULT! =)");
+        return;
+    }
+
+    writer.StartObject();
+    writer.Key("devices");
+    writer.StartArray();
+    for (int i = 0; i < mainWindow->conf->count; i++)
+    {
+        writer.StartObject();
+
+        writer.Key("class");
+        writer.String("IEC101GenericSlave");
+
+        writer.Key("parent");
+        writer.String("IEC101M");
+
+        writer.Key("name");
+        writer.String(mainWindow->conf->devices[i].boardName.toStdString().c_str());
+
+        writer.Key("template");
+        writer.String(mainWindow->conf->templateName.toStdString().c_str());
+
+        writer.Key("parameters");
+
+        writer.StartObject();
+
+        writer.Key("linkAddress");
+
+        writer.String(mainWindow->conf->devices[i].linkAddress.toStdString().c_str());
+
+        writer.Key("ASDUAddress");
+
+        writer.String(mainWindow->conf->devices[i].ASDUAddress.toStdString().c_str());
+
+        writer.EndObject();
+
+        writer.EndObject();
+
+    }
+    writer.EndArray();
+
+
+    writer.Key("tags");
+    writer.StartArray();
+
+    for (int i = 0; i < mainWindow->conf->count; i++)
+    {
+        for (auto iter = documentFromFile["templates"].Begin(); iter != documentFromFile["templates"].End(); ++iter)
+        {
+            auto tag = iter->GetObject();
+
+            writer.StartObject();
+
+            writer.Key("type");
+            writer.String("Instance");
+
+            writer.Key("name");
+
+            tmp = mainWindow->conf->devices[i].boardName.toStdString() + "." + tag["name"].GetString();
+
+            writer.String(tmp.c_str());
+
+            writer.Key("base");
+            writer.String(tag["name"].GetString());
+
+            writer.Key("mappings");
+            writer.StartObject();
+
+            auto connection = tag["parameters"].GetObject();
+
+            if (connection.HasMember("spontType") || connection.HasMember("interType") || connection.HasMember("cmdType") || connection.HasMember("IOA"))
+            {
+                writer.Key("IEC101S");
+                writer.StartObject();
+
+                if (connection.HasMember("spontType"))
+                {
+                    writer.Key("spontType");
+                    writer.Uint(connection["spontType"].GetUint());
+                }
+
+                if (connection.HasMember("interType"))
+                {
+                    writer.Key("interType");
+                    writer.Uint(connection["interType"].GetUint());
+                }
+
+                if (connection.HasMember("cmdType"))
+                {
+                    writer.Key("cmdType");
+                    writer.Uint(connection["cmdType"].GetUint());
+                }
+
+
+                if (connection.HasMember("IOA"))
+                {
+                    writer.Key("IOA");
+                    writer.Uint(connection["IOA"].GetUint() + (mainWindow->conf->offset * i));
+
+                }
+            }
+
+            writer.EndObject();
+            writer.EndObject();
+            writer.EndObject();
+        }
+    }
+    writer.EndArray();
+    writer.EndObject();
+
+    file << s.GetString() << endl;
+    file.close();
+
+    mainWindow->ui->lbStatus->setText("finished!");
+}
+
+void MainWindow::createMasterJSONIEC104(MainWindow *mainWindow)
+{
+    ofstream file;
+    StringBuffer s;
+    Writer<StringBuffer> writer(s);
+    std::ifstream ifs(mainWindow->conf->templateName.toStdString());
+    IStreamWrapper isw(ifs);
+    Document documentFromFile;
+    documentFromFile.ParseStream(isw);
+
+    s.Clear();
+    writer.Reset(s);
+
+    /*Удаляем лишнее*/
+    int deleter = mainWindow->conf->configName.lastIndexOf("/");
+    QString tempString;
+    tempString = mainWindow->conf->configName.remove(0, deleter+1);
+
+    string tmp = mainWindow->conf->master.toStdString() + tempString.toStdString() + mainWindow->conf->sJson.toStdString();
+
+    file.open(tmp.c_str());
+
+    if (!file.is_open())
+    {
+        mainWindow->ui->lbStatus->setText("HARD FAULT! =)");
+        return;
+    }
+
+    writer.StartObject();
+    writer.Key("devices");
+    writer.StartArray();
+    for (int i = 0; i < mainWindow->conf->count; i++)
+    {
+        writer.StartObject();
+
+        writer.Key("class");
+        writer.String("IEC104GenericSlave");
+
+        writer.Key("parent");
+        writer.String("IEC104M");
+
+        writer.Key("name");
+        writer.String(mainWindow->conf->devices[i].boardName.toStdString().c_str());
+
+        writer.Key("template");
+        writer.String(mainWindow->conf->templateName.toStdString().c_str());
+
+        writer.Key("parameters");
+
+        writer.StartObject();
+
+        writer.Key("linkAddress");
+
+        writer.String(mainWindow->conf->devices[i].linkAddress.toStdString().c_str());
+
+        writer.Key("ASDUAddress");
+
+        writer.String(mainWindow->conf->devices[i].ASDUAddress.toStdString().c_str());
+
+        writer.EndObject();
+
+        writer.EndObject();
+
+    }
+    writer.EndArray();
+
+
+    writer.Key("tags");
+    writer.StartArray();
+
+    for (int i = 0; i < mainWindow->conf->count; i++)
+    {
+        for (auto iter = documentFromFile["templates"].Begin(); iter != documentFromFile["templates"].End(); ++iter)
+        {
+            auto tag = iter->GetObject();
+
+            writer.StartObject();
+
+            writer.Key("type");
+            writer.String("Instance");
+
+            writer.Key("name");
+
+            tmp = mainWindow->conf->devices[i].boardName.toStdString() + "." + tag["name"].GetString();
+
+            writer.String(tmp.c_str());
+
+            writer.Key("base");
+            writer.String(tag["name"].GetString());
+
+            writer.Key("mappings");
+            writer.StartObject();
+
+            auto connection = tag["parameters"].GetObject();
+
+            if (connection.HasMember("spontType") || connection.HasMember("interType") || connection.HasMember("cmdType") || connection.HasMember("IOA"))
+            {
+                writer.Key("IEC101S");
+                writer.StartObject();
+
+                if (connection.HasMember("spontType"))
+                {
+                    writer.Key("spontType");
+                    writer.Uint(connection["spontType"].GetUint());
+                }
+
+                if (connection.HasMember("interType"))
+                {
+                    writer.Key("interType");
+                    writer.Uint(connection["interType"].GetUint());
+                }
+
+                if (connection.HasMember("cmdType"))
+                {
+                    writer.Key("cmdType");
+                    writer.Uint(connection["cmdType"].GetUint());
+                }
+
+
+                if (connection.HasMember("IOA"))
+                {
+                    writer.Key("IOA");
+                    writer.Uint(connection["IOA"].GetUint() + (mainWindow->conf->offset * i));
+
+                }
+            }
+
+            writer.EndObject();
+            writer.EndObject();
+            writer.EndObject();
+        }
+    }
+    writer.EndArray();
+    writer.EndObject();
+
+    file << s.GetString() << endl;
+    file.close();
+
+    mainWindow->ui->lbStatus->setText("finished!");
+}
+
 void MainWindow::createTemplateIEC101(MainWindow *mainWindow)
 {
     std::ofstream file;
@@ -371,145 +661,5 @@ void MainWindow::createTemplateIEC101(MainWindow *mainWindow)
 
 void MainWindow::on_pbCreateJson_clicked()  //создание json-master
 {
-    ofstream file;
-    StringBuffer s;
-    Writer<StringBuffer> writer(s);
-    std::ifstream ifs(conf->templateName.toStdString());
-    IStreamWrapper isw(ifs);
-    Document documentFromFile;
-    documentFromFile.ParseStream(isw);
-
-    s.Clear();
-    writer.Reset(s);
-
-    /*Удаляем лишнее*/
-    int deleter = conf->configName.lastIndexOf("/");
-    QString tempString;
-    tempString = conf->configName.remove(0, deleter+1);
-
-    string tmp = conf->master.toStdString() + tempString.toStdString() + conf->sJson.toStdString();
-
-    file.open(tmp.c_str());
-
-    if (!file.is_open())
-    {
-        ui->lbStatus->setText("HARD FAULT! =)");
-        return;
-    }
-
-    writer.StartObject();
-    writer.Key("devices");
-    writer.StartArray();
-    for (int i = 0; i < conf->count; i++)
-    {
-//        uint32_t a = 0;
-        writer.StartObject();
-
-        writer.Key("class");
-        writer.String("IEC104GenericSlave");
-
-        writer.Key("parent");
-        writer.String("IEC104M");
-
-        writer.Key("name");
-        writer.String(conf->devices[i].boardName.toStdString().c_str());
-
-        writer.Key("template");
-        writer.String(conf->templateName.toStdString().c_str());
-
-        writer.Key("parameters");
-
-        writer.StartObject();
-
-        writer.Key("linkAddress");
-
-        writer.String(conf->devices[i].linkAddress.toStdString().c_str());
-
-        writer.Key("ASDUAddress");
-
-        writer.String(conf->devices[i].ASDUAddress.toStdString().c_str());
-//        std::cout << "enter ASDUAddress for board " << i + 1 << endl;
-//        cin >> a;
-//        writer.Uint(a);
-
-        writer.EndObject();
-
-        writer.EndObject();
-
-    }
-    writer.EndArray();
-
-
-    writer.Key("tags");
-    writer.StartArray();
-
-    for (int i = 0; i < conf->count; i++)
-    {
-        for (auto iter = documentFromFile["templates"].Begin(); iter != documentFromFile["templates"].End(); ++iter)
-        {
-            auto tag = iter->GetObject();
-
-            writer.StartObject();
-
-            writer.Key("type");
-            writer.String("Instance");
-
-            writer.Key("name");
-
-            tmp = conf->devices[i].boardName.toStdString() + "." + tag["name"].GetString();
-
-            writer.String(tmp.c_str());
-
-            writer.Key("base");
-            writer.String(tag["name"].GetString());
-
-            writer.Key("mappings");
-            writer.StartObject();
-
-            auto connection = tag["parameters"].GetObject();
-
-            if (connection.HasMember("spontType") || connection.HasMember("interType") || connection.HasMember("cmdType") || connection.HasMember("IOA"))
-            {
-                writer.Key("IEC101S");
-                writer.StartObject();
-
-                if (connection.HasMember("spontType"))
-                {
-                    writer.Key("spontType");
-                    writer.Uint(connection["spontType"].GetUint());
-                }
-
-                if (connection.HasMember("interType"))
-                {
-                    writer.Key("interType");
-                    writer.Uint(connection["interType"].GetUint());
-                }
-
-                if (connection.HasMember("cmdType"))
-                {
-                    writer.Key("cmdType");
-                    writer.Uint(connection["cmdType"].GetUint());
-                }
-
-
-                if (connection.HasMember("IOA"))
-                {
-                    writer.Key("IOA");
-                    writer.Uint(connection["IOA"].GetUint() + (conf->offset * i));
-
-                }
-            }
-
-            writer.EndObject();
-            writer.EndObject();
-            writer.EndObject();
-        }
-    }
-    writer.EndArray();
-    writer.EndObject();
-
-    file << s.GetString() << endl;
-    file.close();
-
-    ui->lbStatus->setText("finished!");
+    createMasterJSONFunctions[ui->cbInterface->currentIndex()](this);
 }

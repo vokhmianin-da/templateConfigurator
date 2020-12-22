@@ -40,10 +40,15 @@ private:
     QString filter;  //фильтр форматов файлов
     using funcVector = std::vector <void (*)(MainWindow *)>;
     funcVector createTemplateFunctions;
+    funcVector createMasterJSONFunctions;
 
     /*Функции для создания template*/
     static void createTemplateIEC101(MainWindow *mainWindow);
     static void createTemplateIEC104(MainWindow *mainWindow);
+
+    /*Функции для создания template*/
+    static void createMasterJSONIEC101(MainWindow *mainWindow);
+    static void createMasterJSONIEC104(MainWindow *mainWindow);
 };
 
 #endif // MAINWINDOW_H
