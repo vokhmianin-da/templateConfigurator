@@ -4,6 +4,8 @@
 #include <QFileDialog>
 #include <QTextStream>
 
+using namespace rapidjson;
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
@@ -32,9 +34,10 @@ void MainWindow::on_pbSelectFile_clicked()  //выбор json-slave
             // находится в конце
             // строки названия файла
         {
+           QString temp("Slave-json: ");
+           ui->lbFileName->setText(temp.append(conf->configName));
            conf->configName.remove(".json");    //удаляем лишнее
-           ui->lbStatus->setText("Файл выбран");
-           ui->lbFileName->setText(conf->configName);
+           ui->lbStatus->setText("Файл slave-json выбран");
         }
         else
         {
@@ -43,7 +46,7 @@ void MainWindow::on_pbSelectFile_clicked()  //выбор json-slave
     }
     else
     {
-        ui->lbStatus->setText("Файл не выбран");
+        ui->lbStatus->setText("Файл slave-json не выбран");
         ui->lbFileName->clear();
     }
 }
@@ -111,9 +114,10 @@ void MainWindow::on_pbSelectTemplate_clicked()  //выбор template
             // находится в конце
             // строки названия файла
         {
+           QString temp("Template-json: ");
+           ui->lbStatus->setText("Файл template-json выбран");
+           ui->lbTemplateName->setText(temp.append(conf->templateName));
            conf->templateName.remove(".json");    //удаляем лишнее
-           ui->lbStatus->setText("Файл выбран");
-           ui->lbTemplateName->setText(conf->templateName);
         }
         else
         {
@@ -122,12 +126,16 @@ void MainWindow::on_pbSelectTemplate_clicked()  //выбор template
     }
     else
     {
-        ui->lbStatus->setText("Файл не выбран");
+        ui->lbStatus->setText("Файл template-json не выбран");
         ui->lbTemplateName->clear();
     }
 }
 
 void MainWindow::on_pbCreateTemplate_clicked()  //создание template
 {
+    std::ofstream file;
+    StringBuffer s;
+    Writer<StringBuffer> writer(s);
+
 
 }
