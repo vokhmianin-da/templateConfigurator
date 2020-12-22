@@ -21,6 +21,14 @@ public:
 private slots:
     void on_pbSelectFile_clicked();
 
+    void on_cbIsTemplate_clicked();
+
+    void on_pbSetLinkASDU_clicked();
+
+    void on_cbDevices_currentIndexChanged(int index);
+
+    void on_pbResetLinkASDU_clicked();
+
 private:
     Ui::MainWindow *ui;
 };

@@ -13,6 +13,13 @@
 #include <sstream>
 
 
+struct Devices
+{
+    QString boardName;
+    QString linkAddress;
+    QString ASDUAddress;
+};
+
 class configJson
 {    
 public:
@@ -21,11 +28,11 @@ public:
     const QString templName = "template_";
     const QString master = "master_";
     QString configName; //имя загружаемого файла
-    QString templateName;
+    QString templateName; //имя шаблона
     QString sJson = ".json";
+    std::vector <Devices> devices;
 
-    QString* boardNames;
-    int count;
+    int count = 0;
     int greatestAddr =  0;
     int offset = 0;
 };
