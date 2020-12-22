@@ -29,6 +29,10 @@ private slots:
 
     void on_pbResetLinkASDU_clicked();
 
+    void on_pbSelectTemplate_clicked();
+
+    void on_pbCreateTemplate_clicked();
+
 private:
     Ui::MainWindow *ui;
 };

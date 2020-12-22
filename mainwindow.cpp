@@ -18,7 +18,7 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::on_pbSelectFile_clicked()
+void MainWindow::on_pbSelectFile_clicked()  //выбор json-slave
 {
     conf->configName = QFileDialog::getOpenFileName(this, tr("Открыть"), QDir::current().path(), filter);
     if (conf->configName.length() > 0)
@@ -48,7 +48,7 @@ void MainWindow::on_pbSelectFile_clicked()
     }
 }
 
-void MainWindow::on_cbIsTemplate_clicked()
+void MainWindow::on_cbIsTemplate_clicked()  //создать/выбрать template
 {
     if(ui->cbIsTemplate->isChecked())
     {
@@ -62,7 +62,7 @@ void MainWindow::on_cbIsTemplate_clicked()
     }
 }
 
-void MainWindow::on_pbSetLinkASDU_clicked()
+void MainWindow::on_pbSetLinkASDU_clicked() //создание device
 {
     if(!ui->leDeviceName->text().isEmpty() && !ui->leLinkAddr->text().isEmpty() && !ui->leASDUAddr->text().isEmpty())
     {
@@ -78,14 +78,14 @@ void MainWindow::on_pbSetLinkASDU_clicked()
     }
 }
 
-void MainWindow::on_cbDevices_currentIndexChanged(int index)
+void MainWindow::on_cbDevices_currentIndexChanged(int index)    //отображение текущего device
 {
     ui->leDeviceName->setText(conf->devices[index].boardName);
     ui->leLinkAddr->setText(conf->devices[index].linkAddress);
     ui->leASDUAddr->setText(conf->devices[index].ASDUAddress);
 }
 
-void MainWindow::on_pbResetLinkASDU_clicked()
+void MainWindow::on_pbResetLinkASDU_clicked()   //удаление device
 {
     conf->devices.erase(conf->devices.begin() + ui->cbDevices->currentIndex()); //удаляем из vector
     conf->count--; //увеличиваем количество devices
@@ -95,4 +95,39 @@ void MainWindow::on_pbResetLinkASDU_clicked()
     ui->leDeviceName->setText(conf->devices[ui->cbDevices->currentIndex()].boardName);
     ui->leLinkAddr->setText(conf->devices[ui->cbDevices->currentIndex()].linkAddress);
     ui->leASDUAddr->setText(conf->devices[ui->cbDevices->currentIndex()].ASDUAddress);
+}
+
+void MainWindow::on_pbSelectTemplate_clicked()  //выбор template
+{
+    conf->templateName = QFileDialog::getOpenFileName(this, tr("Открыть"), QDir::current().path(), filter);
+    if (conf->templateName.length() > 0)
+    {
+        int index = conf->templateName.indexOf(".json");              // определяем, есть ли в
+        // названии строка ".json"
+        if (index != -1 && conf->templateName.length() - 5 == index) // если это файл json,
+            // выполняются 2 условия:
+            // строка ".json" есть
+            // в названии, и она
+            // находится в конце
+            // строки названия файла
+        {
+           conf->templateName.remove(".json");    //удаляем лишнее
+           ui->lbStatus->setText("Файл выбран");
+           ui->lbTemplateName->setText(conf->templateName);
+        }
+        else
+        {
+            ui->lbStatus->setText("Неподходящий формат файла");
+        }
+    }
+    else
+    {
+        ui->lbStatus->setText("Файл не выбран");
+        ui->lbTemplateName->clear();
+    }
+}
+
+void MainWindow::on_pbCreateTemplate_clicked()  //создание template
+{
+
 }
