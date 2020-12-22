@@ -106,23 +106,17 @@
          </widget>
         </item>
         <item>
-         <widget class="QRadioButton" name="rbIEC101">
-          <property name="layoutDirection">
-           <enum>Qt::LeftToRight</enum>
-          </property>
-          <property name="text">
-           <string>IEC101</string>
-          </property>
-          <property name="checked">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QRadioButton" name="rbIEC104">
-          <property name="text">
-           <string>IEC104</string>
-          </property>
+         <widget class="QComboBox" name="cbInterface">
+          <item>
+           <property name="text">
+            <string>IEC101</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>IEC104</string>
+           </property>
+          </item>
          </widget>
         </item>
         <item>

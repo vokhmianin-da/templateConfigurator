@@ -9,7 +9,11 @@ using namespace std;
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
-    ui(new Ui::MainWindow)
+    ui(new Ui::MainWindow),
+    createTemplateFunctions{
+        createTemplateIEC101,
+        createTemplateIEC104
+        }
 {
     ui->setupUi(this);
     conf = new configJson;
@@ -35,10 +39,10 @@ void MainWindow::on_pbSelectFile_clicked()  //выбор json-slave
             // находится в конце
             // строки названия файла
         {
-           QString temp("Slave-json: ");
-           ui->lbFileName->setText(temp.append(conf->configName));
-           conf->configName.remove(".json");    //удаляем лишнее
-           ui->lbStatus->setText("Файл slave-json выбран");
+            QString temp("Slave-json: ");
+            ui->lbFileName->setText(temp.append(conf->configName));
+            conf->configName.remove(".json");    //удаляем лишнее
+            ui->lbStatus->setText("Файл slave-json выбран");
         }
         else
         {
@@ -86,9 +90,9 @@ void MainWindow::on_cbDevices_currentIndexChanged(int index)    //отображ
 {
     if(!conf->devices.empty())
     {
-    ui->leDeviceName->setText(conf->devices[index].boardName);
-    ui->leLinkAddr->setText(conf->devices[index].linkAddress);
-    ui->leASDUAddr->setText(conf->devices[index].ASDUAddress);
+        ui->leDeviceName->setText(conf->devices[index].boardName);
+        ui->leLinkAddr->setText(conf->devices[index].linkAddress);
+        ui->leASDUAddr->setText(conf->devices[index].ASDUAddress);
     }
     else
     {
@@ -102,17 +106,17 @@ void MainWindow::on_pbResetLinkASDU_clicked()   //удаление device
 {
     if(!conf->devices.empty())
     {
-    conf->devices.erase(conf->devices.begin() + ui->cbDevices->currentIndex()); //удаляем из vector
-    conf->count--; //уменьшаем количество devices
-    ui->lePlatsQuantity->setText(QString::number(conf->count)); //отображаем кол-во
-    ui->cbDevices->removeItem(ui->cbDevices->currentIndex());   //удаляем из списка
-    if(conf->count)
-    {
-    /*Отображаем новый текущий элемент*/
-    ui->leDeviceName->setText(conf->devices[ui->cbDevices->currentIndex()].boardName);
-    ui->leLinkAddr->setText(conf->devices[ui->cbDevices->currentIndex()].linkAddress);
-    ui->leASDUAddr->setText(conf->devices[ui->cbDevices->currentIndex()].ASDUAddress);
-    }
+        conf->devices.erase(conf->devices.begin() + ui->cbDevices->currentIndex()); //удаляем из vector
+        conf->count--; //уменьшаем количество devices
+        ui->lePlatsQuantity->setText(QString::number(conf->count)); //отображаем кол-во
+        ui->cbDevices->removeItem(ui->cbDevices->currentIndex());   //удаляем из списка
+        if(conf->count)
+        {
+            /*Отображаем новый текущий элемент*/
+            ui->leDeviceName->setText(conf->devices[ui->cbDevices->currentIndex()].boardName);
+            ui->leLinkAddr->setText(conf->devices[ui->cbDevices->currentIndex()].linkAddress);
+            ui->leASDUAddr->setText(conf->devices[ui->cbDevices->currentIndex()].ASDUAddress);
+        }
     }
 }
 
@@ -130,10 +134,10 @@ void MainWindow::on_pbSelectTemplate_clicked()  //выбор template
             // находится в конце
             // строки названия файла
         {
-           QString temp("Template-json: ");
-           ui->lbStatus->setText("Файл template-json выбран");
-           ui->lbTemplateName->setText(temp.append(conf->templateName));
-           conf->templateName.remove(".json");    //удаляем лишнее
+            QString temp("Template-json: ");
+            ui->lbStatus->setText("Файл template-json выбран");
+            ui->lbTemplateName->setText(temp.append(conf->templateName));
+            conf->templateName.remove(".json");    //удаляем лишнее
         }
         else
         {
@@ -149,31 +153,37 @@ void MainWindow::on_pbSelectTemplate_clicked()  //выбор template
 
 void MainWindow::on_pbCreateTemplate_clicked()  //создание template
 {
+    createTemplateFunctions[ui->cbInterface->currentIndex()](this);
+
+}
+
+void MainWindow::createTemplateIEC104(MainWindow *mainWindow)
+{
     std::ofstream file;
     StringBuffer s;
     Writer<StringBuffer> writer(s);
 
-    std::ifstream ifs((conf->configName + conf->sJson).toStdString());
+    std::ifstream ifs((mainWindow->conf->configName + mainWindow->conf->sJson).toStdString());
     IStreamWrapper isw(ifs);
     Document documentFromFile;
 
     documentFromFile.ParseStream(isw);
 
     if (documentFromFile.IsNull()) {
-        ui->lbStatus->setText("Unable to read document");
+        mainWindow->ui->lbStatus->setText("Unable to read document");
         return;
     }
     /*Удаляем лишнее*/
-    int deleter = conf->configName.lastIndexOf("/");
+    int deleter = mainWindow->conf->configName.lastIndexOf("/");
     QString tempString;
-    tempString = conf->configName.remove(0, deleter+1);
+    tempString = mainWindow->conf->configName.remove(0, deleter+1);
 
-    conf->templateName = conf->templName + tempString + conf->sJson;
-    file.open(conf->templateName.toStdString());
+    mainWindow->conf->templateName = mainWindow->conf->templName + tempString + mainWindow->conf->sJson;
+    file.open(mainWindow->conf->templateName.toStdString());
 
     if (!file.is_open())
     {
-        ui->lbStatus->setText("HARD FAULT! =)");
+        mainWindow->ui->lbStatus->setText("HARD FAULT! =)");
         return;
     }
 
@@ -232,7 +242,7 @@ void MainWindow::on_pbCreateTemplate_clicked()  //создание template
 
                 if (iter == documentFromFile["tags"].End())
                 {
-                    conf->greatestAddr = iecObj["IOA"].GetUint();
+                    mainWindow->conf->greatestAddr = iecObj["IOA"].GetUint();
                 }
             }
 
@@ -248,8 +258,113 @@ void MainWindow::on_pbCreateTemplate_clicked()  //создание template
 
     file.close();
     writer.Reset(s);
-    conf->templateName = conf->templName + conf->configName;// +sJson;
 
-    ui->lbStatus->setText("template OK!");
 
+    mainWindow->ui->lbStatus->setText("template OK!");
+}
+
+void MainWindow::createTemplateIEC101(MainWindow *mainWindow)
+{
+    std::ofstream file;
+    StringBuffer s;
+    Writer<StringBuffer> writer(s);
+
+    std::ifstream ifs((mainWindow->conf->configName + mainWindow->conf->sJson).toStdString());
+    IStreamWrapper isw(ifs);
+    Document documentFromFile;
+
+    documentFromFile.ParseStream(isw);
+
+    if (documentFromFile.IsNull()) {
+        mainWindow->ui->lbStatus->setText("Unable to read document");
+        return;
+    }
+    /*Удаляем лишнее*/
+    int deleter = mainWindow->conf->configName.lastIndexOf("/");
+    QString tempString;
+    tempString = mainWindow->conf->configName.remove(0, deleter+1);
+
+    mainWindow->conf->templateName = mainWindow->conf->templName + tempString + mainWindow->conf->sJson;
+    file.open(mainWindow->conf->templateName.toStdString());
+
+    if (!file.is_open())
+    {
+        mainWindow->ui->lbStatus->setText("HARD FAULT! =)");
+        return;
+    }
+
+    writer.StartObject();
+    writer.Key("templates");
+    writer.StartArray();
+
+
+    for (auto iter = documentFromFile["tags"].Begin(); iter != documentFromFile["tags"].End(); ++iter)
+    {
+        auto tag = iter->GetObject();
+        auto iec = tag["mappings"].GetObject().FindMember("IEC101S");
+
+        if (iec->value.IsObject())
+        {
+            auto iecObj = iec->value.GetObject();
+
+            if (!(iecObj.HasMember("spontType") || iecObj.HasMember("interType") || iecObj.HasMember("cmdType") || iecObj.HasMember("IOA")))
+            {
+                continue;
+            }
+
+            writer.StartObject();
+
+            writer.Key("type");
+            writer.String(tag["type"].GetString());
+
+            writer.Key("name");
+            writer.String(tag["name"].GetString());
+
+            writer.Key("parameters");
+            writer.StartObject();
+
+            if (iecObj.HasMember("spontType"))
+            {
+                writer.Key("spontType");
+                writer.Uint(iecObj["spontType"].GetUint());
+            }
+
+            if (iecObj.HasMember("interType"))
+            {
+                writer.Key("interType");
+                writer.Uint(iecObj["interType"].GetUint());
+            }
+
+            if (iecObj.HasMember("cmdType"))
+            {
+                writer.Key("cmdType");
+                writer.Uint(iecObj["cmdType"].GetUint());
+            }
+
+            if (iecObj.HasMember("IOA"))
+            {
+                writer.Key("IOA");
+                writer.Uint(iecObj["IOA"].GetUint());
+
+                if (iter == documentFromFile["tags"].End())
+                {
+                    mainWindow->conf->greatestAddr = iecObj["IOA"].GetUint();
+                }
+            }
+
+            writer.EndObject();
+            writer.EndObject();
+        }
+
+    }
+    writer.EndArray();
+    writer.EndObject();
+
+    file << s.GetString() << endl;
+
+    file.close();
+    writer.Reset(s);
+
+
+    mainWindow->ui->lbStatus->setText("template OK!");
 }
