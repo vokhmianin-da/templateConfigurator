@@ -32,6 +32,7 @@ public:
     QString sJson = ".json";
     std::vector <Devices> devices;
 
+    QString cropName(QString);
     int count = 0;
     int greatestAddr =  0;
     int offset = 0;

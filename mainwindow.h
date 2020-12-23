@@ -49,6 +49,9 @@ private:
     /*Функции для создания template*/
     static void createMasterJSONIEC101(MainWindow *mainWindow);
     static void createMasterJSONIEC104(MainWindow *mainWindow);
+
+signals:
+    void notOpenSlaveJson();
 };
 
 #endif // MAINWINDOW_H

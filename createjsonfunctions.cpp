@@ -21,14 +21,16 @@ void MainWindow::createTemplateIEC104(MainWindow *mainWindow)
 
     if (documentFromFile.IsNull()) {
         mainWindow->ui->lbStatus->setText("Не удалось прочитать slave.json");
+        emit mainWindow->notOpenSlaveJson();
         return;
     }
     /*Удаляем лишнее*/
-    int deleter = mainWindow->conf->configName.lastIndexOf("/");
     QString tempString;
-    tempString = mainWindow->conf->configName.remove(0, deleter+1);
+    tempString = mainWindow->conf->cropName(mainWindow->conf->configName);
 
     mainWindow->conf->templateName = mainWindow->conf->templName + tempString + mainWindow->conf->sJson;
+    mainWindow->conf->templateName = QFileDialog::getSaveFileName(mainWindow, tr("Сохранить template как"), mainWindow->conf->templateName, mainWindow->filter);
+
     file.open(mainWindow->conf->templateName.toStdString());
 
     if (!file.is_open())
@@ -127,11 +129,12 @@ void MainWindow::createMasterJSONIEC101(MainWindow *mainWindow)
     writer.Reset(s);
 
     /*Удаляем лишнее*/
-    int deleter = mainWindow->conf->configName.lastIndexOf("/");
     QString tempString;
-    tempString = mainWindow->conf->configName.remove(0, deleter+1);
+    tempString = mainWindow->conf->cropName(mainWindow->conf->configName);
 
-    string tmp = mainWindow->conf->master.toStdString() + tempString.toStdString() + mainWindow->conf->sJson.toStdString();
+    tempString = mainWindow->conf->master + tempString + mainWindow->conf->sJson;
+    tempString = QFileDialog::getSaveFileName(mainWindow, tr("Сохранить master.json как"), tempString, mainWindow->filter);
+    string tmp = tempString.toStdString();
 
     file.open(tmp.c_str());
 
@@ -168,7 +171,8 @@ void MainWindow::createMasterJSONIEC101(MainWindow *mainWindow)
         writer.String(mainWindow->conf->devices[i].boardName.toStdString().c_str());
 
         writer.Key("template");
-        writer.String(mainWindow->conf->templateName.toStdString().c_str());
+        tempString = mainWindow->conf->cropName(mainWindow->conf->templateName);
+        writer.String(tempString.toStdString().c_str());
 
         writer.Key("parameters");
 
@@ -278,11 +282,12 @@ void MainWindow::createMasterJSONIEC104(MainWindow *mainWindow)
     writer.Reset(s);
 
     /*Удаляем лишнее*/
-    int deleter = mainWindow->conf->configName.lastIndexOf("/");
     QString tempString;
-    tempString = mainWindow->conf->configName.remove(0, deleter+1);
+    tempString = mainWindow->conf->cropName(mainWindow->conf->configName);
 
-    string tmp = mainWindow->conf->master.toStdString() + tempString.toStdString() + mainWindow->conf->sJson.toStdString();
+    tempString = mainWindow->conf->master + tempString + mainWindow->conf->sJson;
+    tempString = QFileDialog::getSaveFileName(mainWindow, tr("Сохранить master.json как"), tempString, mainWindow->filter);
+    string tmp = tempString.toStdString();
 
     file.open(tmp.c_str());
 
@@ -319,7 +324,8 @@ void MainWindow::createMasterJSONIEC104(MainWindow *mainWindow)
         writer.String(mainWindow->conf->devices[i].boardName.toStdString().c_str());
 
         writer.Key("template");
-        writer.String(mainWindow->conf->templateName.toStdString().c_str());
+        tempString = mainWindow->conf->cropName(mainWindow->conf->templateName);
+        writer.String(tempString.toStdString().c_str());
 
         writer.Key("parameters");
 
@@ -429,14 +435,15 @@ void MainWindow::createTemplateIEC101(MainWindow *mainWindow)
 
     if (documentFromFile.IsNull()) {
         mainWindow->ui->lbStatus->setText("Не удалось прочитать slave.json");
+        emit mainWindow->notOpenSlaveJson();
         return;
     }
     /*Удаляем лишнее*/
-    int deleter = mainWindow->conf->configName.lastIndexOf("/");
     QString tempString;
-    tempString = mainWindow->conf->configName.remove(0, deleter+1);
+    tempString = mainWindow->conf->cropName(mainWindow->conf->configName);
 
     mainWindow->conf->templateName = mainWindow->conf->templName + tempString + mainWindow->conf->sJson;
+    mainWindow->conf->templateName = QFileDialog::getSaveFileName(mainWindow, tr("Сохранить template как"), mainWindow->conf->templateName, mainWindow->filter);
     file.open(mainWindow->conf->templateName.toStdString());
 
     if (!file.is_open())
@@ -519,4 +526,14 @@ void MainWindow::createTemplateIEC101(MainWindow *mainWindow)
 
 
     mainWindow->ui->lbStatus->setText("template OK!");
+}
+
+QString configJson::cropName(QString originalString)
+{
+    /*Удаляем лишнее*/
+    int deleter = originalString.lastIndexOf("/");
+    QString newString;
+    newString = originalString.remove(0, deleter+1);
+    newString = newString.remove(".json");
+    return newString;
 }

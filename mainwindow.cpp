@@ -26,6 +26,7 @@ MainWindow::MainWindow(QWidget *parent) :
     /*Можно вводить только целочисленные данные */
     ui->leLinkAddr->setValidator( new QIntValidator);
     ui->leASDUAddr->setValidator( new QIntValidator);
+    connect(this, SIGNAL(notOpenSlaveJson()), this, SLOT(on_pbSelectFile_clicked()));
 }
 
 MainWindow::~MainWindow()
@@ -35,7 +36,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_pbSelectFile_clicked()  //выбор json-slave
 {
-    conf->configName = QFileDialog::getOpenFileName(this, tr("Открыть"), QDir::current().path(), filter);
+    conf->configName = QFileDialog::getOpenFileName(this, tr("Выбрать slave.json"), QDir::current().path(), filter);
     if (conf->configName.length() > 0)
     {
         int index = conf->configName.indexOf(".json");              // определяем, есть ли в
@@ -130,7 +131,7 @@ void MainWindow::on_pbResetLinkASDU_clicked()   //удаление device
 
 void MainWindow::on_pbSelectTemplate_clicked()  //выбор template
 {
-    conf->templateName = QFileDialog::getOpenFileName(this, tr("Открыть"), QDir::current().path(), filter);
+    conf->templateName = QFileDialog::getOpenFileName(this, tr("Выбрать template.json"), QDir::current().path(), filter);
     if (conf->templateName.length() > 0)
     {
         int index = conf->templateName.indexOf(".json");              // определяем, есть ли в
