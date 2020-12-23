@@ -14,7 +14,8 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-    configjson.cpp
+    configjson.cpp \
+    createjsonfunctions.cpp
 
 HEADERS  += mainwindow.h \
     rapidjson/error/en.h \
