@@ -125,6 +125,17 @@ void MainWindow::createMasterJSONIEC101(MainWindow *mainWindow)
     Document documentFromFile;
     documentFromFile.ParseStream(isw);
 
+    if (mainWindow->conf->templateName.isEmpty())
+    {
+        mainWindow->ui->lbStatus->setText("Не выбран файл template");
+        return;
+    }
+    if (!mainWindow->conf->count)
+    {
+        mainWindow->ui->lbStatus->setText("Не заданы devices");
+        return;
+    }
+
     s.Clear();
     writer.Reset(s);
 
@@ -141,16 +152,6 @@ void MainWindow::createMasterJSONIEC101(MainWindow *mainWindow)
     if (!file.is_open())
     {
         mainWindow->ui->lbStatus->setText("HARD FAULT! =)");
-        return;
-    }
-    if (mainWindow->conf->templateName.isEmpty())
-    {
-        mainWindow->ui->lbStatus->setText("Не выбран файл template");
-        return;
-    }
-    if (!mainWindow->conf->count)
-    {
-        mainWindow->ui->lbStatus->setText("Не заданы devices");
         return;
     }
 
@@ -278,6 +279,17 @@ void MainWindow::createMasterJSONIEC104(MainWindow *mainWindow)
     Document documentFromFile;
     documentFromFile.ParseStream(isw);
 
+    if (mainWindow->conf->templateName.isEmpty())
+    {
+        mainWindow->ui->lbStatus->setText("Не выбран файл template");
+        return;
+    }
+    if (!mainWindow->conf->count)
+    {
+        mainWindow->ui->lbStatus->setText("Не заданы devices");
+        return;
+    }
+
     s.Clear();
     writer.Reset(s);
 
@@ -294,16 +306,6 @@ void MainWindow::createMasterJSONIEC104(MainWindow *mainWindow)
     if (!file.is_open())
     {
         mainWindow->ui->lbStatus->setText("HARD FAULT! =)");
-        return;
-    }
-    if (mainWindow->conf->templateName.isEmpty())
-    {
-        mainWindow->ui->lbStatus->setText("Не выбран файл template");
-        return;
-    }
-    if (!mainWindow->conf->count)
-    {
-        mainWindow->ui->lbStatus->setText("Не заданы devices");
         return;
     }
 

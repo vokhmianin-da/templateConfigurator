@@ -400,6 +400,9 @@
       </item>
       <item>
        <widget class="QPushButton" name="pbCreateJson">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
         <property name="text">
          <string>Создать json</string>
         </property>
