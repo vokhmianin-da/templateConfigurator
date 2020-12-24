@@ -95,21 +95,6 @@ void MainWindow::on_pbSetLinkASDU_clicked() //создание device
     }
 }
 
-void MainWindow::on_cbDevices_currentIndexChanged(int index)    //отображение текущего device
-{
-    if(!conf->devices.empty())
-    {
-        ui->leDeviceName->setText(conf->devices[index].boardName);
-        ui->leLinkAddr->setText(conf->devices[index].linkAddress);
-        ui->leASDUAddr->setText(conf->devices[index].ASDUAddress);
-    }
-    else
-    {
-        ui->leDeviceName->clear();
-        ui->leLinkAddr->clear();
-        ui->leASDUAddr->clear();
-    }
-}
 
 void MainWindow::on_pbResetLinkASDU_clicked()   //удаление device
 {
@@ -170,4 +155,20 @@ void MainWindow::on_pbCreateTemplate_clicked()  //создание template
 void MainWindow::on_pbCreateJson_clicked()  //создание json-master
 {
     createMasterJSONFunctions[ui->cbInterface->currentIndex()](this);
+}
+
+void MainWindow::on_cbDevices_activated(int index)
+{
+    if(!conf->devices.empty())
+    {
+        ui->leDeviceName->setText(conf->devices[index].boardName);
+        ui->leLinkAddr->setText(conf->devices[index].linkAddress);
+        ui->leASDUAddr->setText(conf->devices[index].ASDUAddress);
+    }
+    else
+    {
+        ui->leDeviceName->clear();
+        ui->leLinkAddr->clear();
+        ui->leASDUAddr->clear();
+    }
 }

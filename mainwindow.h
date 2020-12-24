@@ -24,8 +24,6 @@ private slots:
 
     void on_pbSetLinkASDU_clicked();
 
-    void on_cbDevices_currentIndexChanged(int index);
-
     void on_pbResetLinkASDU_clicked();
 
     void on_pbSelectTemplate_clicked();
@@ -33,6 +31,8 @@ private slots:
     void on_pbCreateTemplate_clicked();
 
     void on_pbCreateJson_clicked();
+
+    void on_cbDevices_activated(int index);
 
 private:
     Ui::MainWindow *ui;
