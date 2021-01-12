@@ -131,7 +131,7 @@ void MainWindow::on_pbSelectTemplate_clicked()  //выбор template
             QString temp("Template-json: ");
             ui->lbStatus->setText("Файл template-json выбран");
             ui->lbTemplateName->setText(temp.append(conf->templateName));
-            conf->templateName.remove(".json");    //удаляем лишнее
+            //conf->templateName.remove(".json");    //удаляем лишнее
         }
         else
         {
