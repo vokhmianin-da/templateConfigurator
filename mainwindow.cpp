@@ -12,11 +12,13 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow),
     createTemplateFunctions{
         createTemplateIEC101,
-        createTemplateIEC104
+        createTemplateIEC104,
+        createTemplateModbus
         },
     createMasterJSONFunctions{
         createMasterJSONIEC101,
-        createMasterJSONIEC104
+        createMasterJSONIEC104,
+        createMasterJSONModbus
         }
 {
     ui->setupUi(this);
@@ -86,7 +88,7 @@ void MainWindow::on_pbSetLinkASDU_clicked() //создание device
         Devices temp;
         temp.boardName = ui->leDeviceName->text();
         temp.linkAddress = ui->leLinkAddr->text();
-        temp.ASDUAddress = ui->leASDUAddr->text();
+        temp.ASDUbrokenTime = ui->leASDUAddr->text();
 
         conf->devices.push_back(temp);  //добавляем новый device
         ui->cbDevices->insertItem(conf->count, conf->devices[conf->count].boardName);   //отображаем в списке
@@ -109,7 +111,7 @@ void MainWindow::on_pbResetLinkASDU_clicked()   //удаление device
             /*Отображаем новый текущий элемент*/
             ui->leDeviceName->setText(conf->devices[ui->cbDevices->currentIndex()].boardName);
             ui->leLinkAddr->setText(conf->devices[ui->cbDevices->currentIndex()].linkAddress);
-            ui->leASDUAddr->setText(conf->devices[ui->cbDevices->currentIndex()].ASDUAddress);
+            ui->leASDUAddr->setText(conf->devices[ui->cbDevices->currentIndex()].ASDUbrokenTime);
         }
     }
 }
@@ -160,15 +162,27 @@ void MainWindow::on_pbCreateJson_clicked()  //создание json-master
 void MainWindow::on_cbDevices_activated(int index)
 {
     if(!conf->devices.empty())
-    {
+    {        
         ui->leDeviceName->setText(conf->devices[index].boardName);
         ui->leLinkAddr->setText(conf->devices[index].linkAddress);
-        ui->leASDUAddr->setText(conf->devices[index].ASDUAddress);
+        ui->leASDUAddr->setText(conf->devices[index].ASDUbrokenTime);
     }
     else
     {
         ui->leDeviceName->clear();
         ui->leLinkAddr->clear();
         ui->leASDUAddr->clear();
+    }
+}
+
+void MainWindow::on_cbInterface_currentIndexChanged(int index)  //изменение имени столбца ASDU/brokenTime в зависимости от выбранного интерфейса
+{
+    if(index == 2)
+    {
+        ui->lbASDUbrokenTime->setText("brokenTime:");
+    }
+    else
+    {
+        ui->lbASDUbrokenTime->setText("ASDUAdress:"); //отображение ASDUAdress для IEC или brokenTime для Modbus
     }
 }

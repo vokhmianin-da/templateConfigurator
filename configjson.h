@@ -9,15 +9,16 @@
 #include "rapidjson/istreamwrapper.h"
 #include <iostream>
 #include <fstream>
-#include <String>
+#include <string>
 #include <sstream>
+#include <vector>
 
 
 struct Devices
 {
     QString boardName;
     QString linkAddress;
-    QString ASDUAddress;
+    QString ASDUbrokenTime;    //ASDUAddress - параметр IEC101 и IEC104
 };
 
 class configJson

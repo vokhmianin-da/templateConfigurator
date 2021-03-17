@@ -34,6 +34,8 @@ private slots:
 
     void on_cbDevices_activated(int index);
 
+    void on_cbInterface_currentIndexChanged(int index);
+
 private:
     Ui::MainWindow *ui;
     configJson *conf;
@@ -45,10 +47,12 @@ private:
     /*Функции для создания template*/
     static void createTemplateIEC101(MainWindow *mainWindow);
     static void createTemplateIEC104(MainWindow *mainWindow);
+    static void createTemplateModbus(MainWindow *mainWindow);
 
     /*Функции для создания template*/
     static void createMasterJSONIEC101(MainWindow *mainWindow);
     static void createMasterJSONIEC104(MainWindow *mainWindow);
+    static void createMasterJSONModbus(MainWindow *mainWindow);
 
 signals:
     void notOpenSlaveJson();
